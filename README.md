@@ -7,18 +7,20 @@ Vencord plugin that automatically finishes Quests for you.
 
 ## Acknowledgements
 
-This plugin is made with help of AI so slop is in play.
  - [Auto Complete Script](https://gist.github.com/aamiaa/204cd9d42013ded9faf646fae7f89fbb)
  - [Vencord (Development/Local)](https://github.com/Vendicated/Vencord)
  - [Readme Maker](https://readme.so/editor)
 
 
-## Appendix
+## Disclaimers
 
+- This plugin is made with help of AI so slop is in play.
 - Is intended to be used as a [Vencord](https://github.com/Vendicated/Vencord) plugin.
 - As this is not part of the official plugins you have to [install it yourself](https://docs.vencord.dev/installing/custom-plugins/).
 - There is a gold button on the Quest menu that says "**Complete Quest!**" which will automatically grab the latest script from [Auto Complete Script](https://gist.github.com/aamiaa/204cd9d42013ded9faf646fae7f89fbb).
-- This script only works on the _desktop version_ of Vencord.
+- This only works on the __desktop version__ of Vencord.
+- This does not work on Quests that requires interactions, such as Activities.
+
 > [!CAUTION]
 > As of April 7th 2026, Discord has expressed their intent to crack down on automating quest completion.
 > 
