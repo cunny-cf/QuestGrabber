@@ -1,5 +1,5 @@
 
-# LazyQuest
+# QuestGrabber
 
 Vencord plugin that automatically finishes Quests for you.
 
