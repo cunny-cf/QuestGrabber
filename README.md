@@ -19,7 +19,7 @@ This plugin is made with help of AI so slop is in play.
 - As this is not part of the official plugins you have to [install it yourself](https://docs.vencord.dev/installing/custom-plugins/).
 - There is a gold button on the Quest menu that says "**Complete Quest!**" which will automatically grab the latest script from [Auto Complete Script](https://gist.github.com/aamiaa/204cd9d42013ded9faf646fae7f89fbb).
 - This script only works on the _desktop version_ of Vencord.
-## [!CAUTION]
+> [!CAUTION]
 > As of April 7th 2026, Discord has expressed their intent to crack down on automating quest completion.
 > 
 > Some users have received the following system message:
