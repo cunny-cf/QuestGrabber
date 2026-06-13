@@ -10,10 +10,13 @@ import { OptionType } from "@utils/types";
 import { showToast, Toasts } from "@webpack/common";
 
 let cachedScript: string | null = null;
+let cachedRemoteVersion: string | null = null;   // ← Version cache
 const CURRENT_VERSION = "1.1.2";
 
-// Raw GitHub URL to the latest version of this plugin/script (update this URL when you move to a repo)
-const VERSION_CHECK_URL = "https://raw.githubusercontent.com/cunny-cf/QuestGrabber/refs/heads/main/userplugins/QuestGrabber/index.ts";
+
+// GitHub repo info
+const GITHUB_REPO = "cunny-cf/QuestGrabber";
+const FILE_PATH = "userplugins/QuestGrabber/index.ts";   // Change if your file path changes
 
 const cfg = definePluginSettings({
     runScript: {
@@ -194,7 +197,18 @@ export default definePlugin({
 });
 
 async function checkForUpdate() {
-    const MAX_RETRIES = 10;
+    // If we already have a cached remote version, just compare
+    if (cachedRemoteVersion) {
+        if (compareVersions(cachedRemoteVersion, CURRENT_VERSION) > 0) {
+            showToast(`New version found: ${cachedRemoteVersion} (you have ${CURRENT_VERSION})`, { timeout: 10000 });
+        } else {
+            showToast(`You are on the latest version ${CURRENT_VERSION}`);
+        }
+        return;
+    }
+
+    // First time check
+    const MAX_RETRIES = 12;
     let attempt = 0;
 
     while (attempt < MAX_RETRIES) {
@@ -202,54 +216,55 @@ async function checkForUpdate() {
         try {
             console.log(`[QuestGrabber] Checking for updates... (Attempt ${attempt}/${MAX_RETRIES})`);
 
-            const response = await fetch(VERSION_CHECK_URL, {
+            const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${FILE_PATH}`;
+
+            const response = await fetch(url, {
                 headers: {
-                    "Cache-Control": "no-cache",
-                    "Pragma": "no-cache"
+                    "Accept": "application/vnd.github.v3+json"
                 }
             });
 
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-            const text = await response.text();
+            const data = await response.json();
+            let content = data.content;
+            if (data.encoding === "base64") {
+                content = atob(content.replace(/\n/g, ''));
+            }
 
-            const versionMatch = text.match(/CURRENT_VERSION\s*=\s*["']([\d.]+)["']/);
+            const versionMatch = content.match(/CURRENT_VERSION\s*=\s*["']([\d.]+)["']/);
             if (!versionMatch || !versionMatch[1]) {
-                console.log("[QuestGrabber] Could not parse version from remote file.");
+                console.log("[QuestGrabber] Could not parse version.");
                 return;
             }
 
-            const remoteVersion = versionMatch[1];
+            cachedRemoteVersion = versionMatch[1];
 
-            if (compareVersions(remoteVersion, CURRENT_VERSION) > 0) {
-                showToast(`New version found: ${remoteVersion} (you have ${CURRENT_VERSION})`);
-                console.log(`[QuestGrabber] Update available! ${CURRENT_VERSION} → ${remoteVersion}`);
+            if (compareVersions(cachedRemoteVersion, CURRENT_VERSION) > 0) {
+                showToast(`New version found: ${cachedRemoteVersion} (you have ${CURRENT_VERSION})`, { timeout: 10000 });
+                console.log(`[QuestGrabber] Update available! ${CURRENT_VERSION} → ${cachedRemoteVersion}`);
             } else {
+                showToast(`You are on the latest version ${CURRENT_VERSION}`);
                 console.log(`[QuestGrabber] You are on the latest version (v${CURRENT_VERSION})`);
             }
-            return; // Success, stop retrying
+            return;
 
         } catch (err: any) {
-            showToast(`Update check failed (Attempt ${attempt}/${MAX_RETRIES})`);
-            console.error(`[QuestGrabber] Update check attempt ${attempt} failed:`, err);
+            console.error(`[QuestGrabber] Update check attempt ${attempt} failed:`, err.message || err);
 
             if (attempt < MAX_RETRIES) {
-                await new Promise(r => setTimeout(r, 900 * attempt));
+                await new Promise(r => setTimeout(r, 1100 * attempt));
             }
         }
     }
 
-    console.warn("[QuestGrabber] Version check failed after 10 attempts.");
+    console.warn("[QuestGrabber] Version check failed after all attempts.");
 }
 
-
-// Simple semantic version comparison
 function compareVersions(a: string, b: string): number {
     const arrA = a.split('.').map(Number);
     const arrB = b.split('.').map(Number);
-    const maxLen = Math.max(arrA.length, arrB.length);
-
-    for (let i = 0; i < maxLen; i++) {
+    for (let i = 0; i < Math.max(arrA.length, arrB.length); i++) {
         const diff = (arrA[i] || 0) - (arrB[i] || 0);
         if (diff !== 0) return diff;
     }
