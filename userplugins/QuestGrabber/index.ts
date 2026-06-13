@@ -32,16 +32,14 @@ const cfg = definePluginSettings({
                 try {
                     const url = "https://api.github.com/gists/204cd9d42013ded9faf646fae7f89fbb";
 
-                    showToast(`Fetching quest script... (Attempt ${attempt}/${MAX_RETRIES})`, {
-                        type: Toasts.Type.MESSAGE,
-                        timeout: 5000
-                    });
+                    showToast(`Fetching quest script... (Attempt ${attempt}/${MAX_RETRIES})`);
                     console.log(`[QuestGrabber] Fetch attempt ${attempt}/${MAX_RETRIES}...`);
 
                     const jsCode = await fetchJsCodeblock(url);
                     if (jsCode) {
                         cachedScript = jsCode;
                         scriptToRun = jsCode;
+                        showToast("Script fetched and cached successfully!");
                         console.log(`[QuestGrabber] Script cached successfully! (${jsCode.length} chars)`);
                         break;
                     }
@@ -55,7 +53,7 @@ const cfg = definePluginSettings({
             }
 
             if (!scriptToRun) {
-                showToast("Failed to fetch script after multiple attempts.", { type: Toasts.Type.FAILURE });
+                showToast("Failed to fetch script after multiple attempts.");
                 resetToggle();
                 return;
             }
@@ -80,10 +78,7 @@ const cfg = definePluginSettings({
                         if (!message) return;
 
                         if (keywords.some(kw => message.includes(kw))) {
-                            showToast(message, {
-                                type: Toasts.Type.MESSAGE,
-                                timeout: 10000
-                            });
+                            showToast(message);
                         }
                     } catch (e) {
                         originalLog("[Toast Error]", ...args);
@@ -97,11 +92,11 @@ const cfg = definePluginSettings({
                 // eslint-disable-next-line no-eval
                 eval(scriptToRun);
 
-                // showToast("Quest script executed successfully!", { type: Toasts.Type.SUCCESS });
+                // showToast("Quest script executed successfully!");
 
             } catch (err) {
                 console.error("[QuestGrabber] Execution error:", err);
-                showToast("Script execution failed - check console", { type: Toasts.Type.FAILURE });
+                showToast("Script execution failed - check console");
             } finally {
                 if (originalLog) console.log = originalLog;
                 if (originalError) console.error = originalError;
@@ -117,10 +112,7 @@ const cfg = definePluginSettings({
         default: false,
         onChange: async (enabled: boolean) => {
             if (!enabled) return;
-            showToast("⚠️ Caution: Using this plugin may lead to account flags or bans. Use at your own risk! ⚠️", {
-                type: Toasts.Type.WARNING,
-                timeout: 10000
-            });
+            showToast("⚠️ Caution: Using this plugin may lead to account flags or bans. Use at your own risk! ⚠️");
             resetToggle();
         },
     }
@@ -175,7 +167,7 @@ export default definePlugin({
             };
 
             stack.appendChild(runButton);
-            console.log("[QuestGrabber] ✅ Run button successfully added next to Orbs buttons");
+            console.log("[QuestGrabber] Run button successfully added next to Orbs buttons");
         });
 
         observer.observe(document.body, {
