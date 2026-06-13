@@ -11,7 +11,7 @@ import { showToast, Toasts } from "@webpack/common";
 
 let cachedScript: string | null = null;
 let cachedRemoteVersion: string | null = null;   // ← Version cache
-const CURRENT_VERSION = "1.1.2";
+const CURRENT_VERSION = "1.1.3";
 
 
 // GitHub repo info
