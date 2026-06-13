@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quest Grabber</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #101010;
+            color: #ffffff;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 900px;
+            padding: 40px 20px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 48px;
+            margin-bottom: 30px;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        button {
+            background-color: #ffd700;
+            color: black;
+            border: none;
+            padding: 14px 32px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 25px;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background-color: #ffaa00;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        textarea {
+            width: 80vw;
+            min-height: 480px;
+            background-color: #1a1a1a;
+            color: #00ff9d;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+            margin-bottom: 30px;
+            white-space: pre;
+            box-sizing: border-box;
+            display: block;
+        }
+
+        .status {
+            margin: 15px 0;
+            min-height: 26px;
+            font-size: 15px;
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 40px 0 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .warning {
+            color: #ff5555;
+            font-weight: 500;
+        }
+
+        .extra a {
+            color: #00ff9d;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Quest Grabber</h1>
+
+        <button id="generateBtn">Generate Script</button>
+
+        <div class="status" id="status"></div>
+
+        <textarea id="output" readonly placeholder="Generated script will appear here..."></textarea>
+
+        <button id="copyBtn" style="display: none; margin: 0 auto 20px auto; display: none;">
+            📋 Copy to Clipboard
+        </button>
+
+        <p style="color:#888; font-size:15px;">
+            Copy the entire code above and paste it into Discord Console (Ctrl + Shift + I → Console)
+        </p>
+    </div>
+
+    <footer>
+        <p class="warning">
+            ⚠️ Use at your own risk. Discord has been actively cracking down on quest automation since April 2026.<br>
+            You may receive warnings or account flags.
+        </p>
+        <p class="extra">Original <a
+                href="https://gist.github.com/aamiaa/204cd9d42013ded9faf646fae7f89fbb">CompleteDiscordQuest</a> script
+            by <a href="https://gist.github.com/aamiaa">aamiaa</a></p>
+        <p class="extra">This is a standalone version of the script, designed to be used outside of the <a
+                href="https://github.com/cunny-cf/QuestGrabber">Vencord plugin.</a></p>
+        <p>Not affiliated with Discord • For educational purposes only</p>
+    </footer>
+
+    <script>
+        const GIST_URL = "https://api.github.com/gists/204cd9d42013ded9faf646fae7f89fbb";
+
+        async function fetchWithRetry(url, maxRetries = 10) {
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                try {
+                    document.getElementById('status').textContent =
+                        `Fetching latest script... (${attempt}/${maxRetries})`;
+
+                    const response = await fetch(url, {
+                        headers: { "Accept": "application/vnd.github.v3+json" }
+                    });
+
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return await response.json();
+                } catch (err) {
+                    console.error(`Attempt ${attempt} failed:`, err);
+                    if (attempt === maxRetries) throw err;
+                    await new Promise(r => setTimeout(r, 1000 * attempt));
+                }
+            }
+        }
+
+        function extractJsCode(content) {
+            const regexes = [
+                /```js\s*([\s\S]*?)\s*```/i,
+                /```javascript\s*([\s\S]*?)\s*```/i,
+                /```(?:js|javascript)\s*([\s\S]*?)\s*```/i
+            ];
+
+            for (const regex of regexes) {
+                const match = content.match(regex);
+                if (match?.[1]) return match[1].trim();
+            }
+            return content.trim();
+        }
+
+        function generateFullScript(questScript) {
+            const escapedScript = questScript
+                .replace(/\\/g, "\\\\")
+                .replace(/`/g, "\\`")
+                .replace(/\$\{/g, "\\${");
+
+            return `// =============================================
+// Quest Grabber - Standalone Version
+// Paste this entire code into Discord Console
+// =============================================
+
+console.log("%c[QuestGrabber] Initializing...", "color: #ffd700; font-weight: bold");
+
+const QUEST_SCRIPT = \`${escapedScript}\`;
+
+// Exact same button as your Vencord plugin
+function addQuestButton() {
+    document.getElementById("questgrabber-run-btn")?.remove();
+
+    const observer = new MutationObserver(() => {
+        const exploreButton = Array.from(document.querySelectorAll("button"))
+            .find(btn => btn.textContent?.includes("Explore Orbs Exclusives"));
+
+        if (!exploreButton) return;
+
+        const stack = exploreButton.closest('.stack_dbd263');
+        if (!stack || document.getElementById("questgrabber-run-btn")) return;
+
+        const runButton = document.createElement("button");
+        runButton.id = "questgrabber-run-btn";
+        runButton.textContent = "Complete Quest!";
+        runButton.style.cssText = "margin: 0; padding: 10px 16px; background-color: #FFD700; color: black; border: none; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; white-space: nowrap; flex-shrink: 0;";
+
+        runButton.onmouseover = () => runButton.style.backgroundColor = "#af9500ff";
+        runButton.onmouseout = () => runButton.style.backgroundColor = "#FFD700";
+
+        runButton.onclick = () => {
+            console.log("%c[QuestGrabber] Running quest script...", "color: #00ff9d");
+            try {
+                eval(QUEST_SCRIPT);
+            } catch (e) {
+                console.error("[QuestGrabber] Execution error:", e);
+            }
+        };
+
+        stack.appendChild(runButton);
+        console.log("[QuestGrabber] Run button successfully added next to Orbs buttons");
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+}
+
+// Initialize
+addQuestButton();
+console.log("%c[QuestGrabber] Ready! Look for the golden 'Complete Quest!' button.", "color: #ffd700");
+`;
+        }
+
+        // Generate Handler
+        document.getElementById('generateBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('generateBtn');
+            const status = document.getElementById('status');
+            const output = document.getElementById('output');
+            const copyBtn = document.getElementById('copyBtn');   // ← Important
+
+            btn.disabled = true;
+            status.style.color = "#ffffff";
+
+            try {
+                const data = await fetchWithRetry(GIST_URL);
+                const rawContent = Object.values(data.files)[0].content;
+
+                const cleanScript = extractJsCode(rawContent);
+                const fullScript = generateFullScript(cleanScript);
+
+                output.value = fullScript;
+                copyBtn.style.display = "block";        // ← Show copy button
+                status.textContent = "✅ Script generated successfully!";
+                status.style.color = "#00ff9d";
+
+            } catch (err) {
+                status.textContent = "❌ Failed to fetch the script. Please try again.";
+                status.style.color = "#ff5555";
+                console.error(err);
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        // Copy Handler
+        document.getElementById('copyBtn').addEventListener('click', async () => {
+            const output = document.getElementById('output');
+            const copyBtn = document.getElementById('copyBtn');
+            const originalText = copyBtn.textContent;
+
+            try {
+                await navigator.clipboard.writeText(output.value);
+
+                copyBtn.textContent = "✅ Copied to Clipboard!";
+                copyBtn.style.backgroundColor = "#00ff9d";
+
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.style.backgroundColor = "#ffd700";
+                }, 2500);
+            } catch (err) {
+                copyBtn.textContent = "❌ Failed to copy";
+                console.error(err);
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.style.backgroundColor = "#ffd700";
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+
+</html>
