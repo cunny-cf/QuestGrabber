@@ -8,12 +8,13 @@ import definePlugin from "@utils/types";
 import { definePluginSettings } from "@api/Settings";
 import { OptionType } from "@utils/types";
 import { showToast, Toasts } from "@webpack/common";
-import { Settings } from "@api/Settings";
 
 let cachedScript: string | null = null;
+const CURRENT_VERSION = "1.1.2";
 
+// Raw GitHub URL to the latest version of this plugin/script (update this URL when you move to a repo)
+const VERSION_CHECK_URL = "https://raw.githubusercontent.com/cunny-cf/QuestGrabber/refs/heads/main/userplugins/QuestGrabber/index.ts";
 
-// \n\n\nAs of April 7th 2026, Discord has expressed their intent to crack down on automating quest completion.\nThere isn't much I can do to make the script undetected, so use it at your own risk, as you most likely WILL get flagged by doing so.\n\nThis does not works in browser for quests which require you to play a game! Use the desktop app to complete those.
 const cfg = definePluginSettings({
     runScript: {
         type: OptionType.BOOLEAN,
@@ -21,6 +22,9 @@ const cfg = definePluginSettings({
         default: false,
         onChange: async (enabled: boolean) => {
             if (!enabled) return;
+
+            // === Version Check ===
+            await checkForUpdate();
 
             const MAX_RETRIES = 10;
             let attempt = 0;
@@ -92,8 +96,6 @@ const cfg = definePluginSettings({
                 // eslint-disable-next-line no-eval
                 eval(scriptToRun);
 
-                // showToast("Quest script executed successfully!");
-
             } catch (err) {
                 console.error("[QuestGrabber] Execution error:", err);
                 showToast("Script execution failed - check console");
@@ -106,9 +108,10 @@ const cfg = definePluginSettings({
             resetToggle();
         },
     },
+
     warningCaution: {
         type: OptionType.BOOLEAN,
-        description: "As of April 7th 2026, Discord has expressed their intent to crack down on automating quest completion.  There isn't much I can do to make the script undetected, so use it at your own risk, as you most likely WILL get flagged by doing so.  This does not works in browser for quests which require you to play a game! Use the desktop app to complete those.",
+        description: "As of April 7th 2026, Discord has expressed their intent to crack down on automating quest completion. ...",
         default: false,
         onChange: async (enabled: boolean) => {
             if (!enabled) return;
@@ -122,8 +125,8 @@ export default definePlugin({
     name: "QuestGrabber",
     description: "Grabs and runs aaimia's CompleteDiscordQuest script for Orbs. \n(https://gist.github.com/aamiaa/204cd9d42013ded9faf646fae7f89fbb)",
     authors: [{ name: "Hina", id: 444684887363026974n }],
+    version: CURRENT_VERSION,           // ← Added
     settings: cfg,
-    cachedScript: null as string | null,
 
     addRunButton() {
         document.getElementById("questgrabber-run-btn")?.remove();
@@ -179,7 +182,7 @@ export default definePlugin({
     },
 
     start() {
-        console.log("[QuestGrabber] Plugin loaded successfully");
+        console.log(`[QuestGrabber] Plugin loaded successfully (v${CURRENT_VERSION})`);
         this.addRunButton();
     },
 
@@ -189,6 +192,69 @@ export default definePlugin({
         document.getElementById("questgrabber-run-btn")?.remove();
     },
 });
+
+async function checkForUpdate() {
+    const MAX_RETRIES = 10;
+    let attempt = 0;
+
+    while (attempt < MAX_RETRIES) {
+        attempt++;
+        try {
+            console.log(`[QuestGrabber] Checking for updates... (Attempt ${attempt}/${MAX_RETRIES})`);
+
+            const response = await fetch(VERSION_CHECK_URL, {
+                headers: {
+                    "Cache-Control": "no-cache",
+                    "Pragma": "no-cache"
+                }
+            });
+
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+            const text = await response.text();
+
+            const versionMatch = text.match(/CURRENT_VERSION\s*=\s*["']([\d.]+)["']/);
+            if (!versionMatch || !versionMatch[1]) {
+                console.log("[QuestGrabber] Could not parse version from remote file.");
+                return;
+            }
+
+            const remoteVersion = versionMatch[1];
+
+            if (compareVersions(remoteVersion, CURRENT_VERSION) > 0) {
+                showToast(`New version found: ${remoteVersion} (you have ${CURRENT_VERSION})`);
+                console.log(`[QuestGrabber] Update available! ${CURRENT_VERSION} → ${remoteVersion}`);
+            } else {
+                console.log(`[QuestGrabber] You are on the latest version (v${CURRENT_VERSION})`);
+            }
+            return; // Success, stop retrying
+
+        } catch (err: any) {
+            showToast(`Update check failed (Attempt ${attempt}/${MAX_RETRIES})`);
+            console.error(`[QuestGrabber] Update check attempt ${attempt} failed:`, err);
+
+            if (attempt < MAX_RETRIES) {
+                await new Promise(r => setTimeout(r, 900 * attempt));
+            }
+        }
+    }
+
+    console.warn("[QuestGrabber] Version check failed after 10 attempts.");
+}
+
+
+// Simple semantic version comparison
+function compareVersions(a: string, b: string): number {
+    const arrA = a.split('.').map(Number);
+    const arrB = b.split('.').map(Number);
+    const maxLen = Math.max(arrA.length, arrB.length);
+
+    for (let i = 0; i < maxLen; i++) {
+        const diff = (arrA[i] || 0) - (arrB[i] || 0);
+        if (diff !== 0) return diff;
+    }
+    return 0;
+}
 
 async function fetchJsCodeblock(url: string): Promise<string | null> {
     try {
