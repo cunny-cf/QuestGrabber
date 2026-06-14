@@ -184,9 +184,78 @@
 
 console.log("%c[QuestGrabber] Initializing...", "color: #ffd700; font-weight: bold");
 
+// Toast Notification System
+function showQuestToast(message, duration = 10000) {
+    let toast = document.getElementById("quest-toast");
+    if (toast) toast.remove();
+
+    toast = document.createElement("div");
+    toast.id = "quest-toast";
+    toast.style.cssText = \`
+        position: fixed;
+        top: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
+        color: #ffffff;
+        padding: 14px 24px;
+        border-radius: 8px;
+        font-family: 'Segoe UI', sans-serif;
+        font-size: 15px;
+        font-weight: 500;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+        border: 1px solid #ffd700;
+        z-index: 999999;
+        pointer-events: none;
+        text-align: center;
+        min-width: 320px;
+        max-width: 620px;
+        white-space: pre-wrap;
+        line-height: 1.4;
+    \`;
+
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        if (toast) {
+            toast.style.transition = "opacity 0.4s ease";
+            toast.style.opacity = "0";
+            setTimeout(() => toast.remove(), 400);
+        }
+    }, duration);
+}
+
+// Enhanced console interceptor
+const originalLog = console.log;
+const originalError = console.error;
+const originalWarn = console.warn;
+
+const keywords = ["quest", "Quest", "quests", "Spoofed"];
+
+const enhancedLog = (...args) => {
+    originalLog(...args);
+
+    try {
+        const message = args.map(a => String(a)).join(" ").trim();
+        if (!message) return;
+
+        if (keywords.some(kw => message.includes(kw))) {
+            showQuestToast(message);
+        }
+    } catch (e) {
+        originalLog("[Toast Error]", ...args);
+    }
+};
+
+// Apply interceptor
+console.log = enhancedLog;
+console.error = enhancedLog;
+console.warn = enhancedLog;
+
 const QUEST_SCRIPT = \`${escapedScript}\`;
 
-// Exact same button as your Vencord plugin
+// Button
 function addQuestButton() {
     document.getElementById("questgrabber-run-btn")?.remove();
 
@@ -208,7 +277,7 @@ function addQuestButton() {
         runButton.onmouseout = () => runButton.style.backgroundColor = "#FFD700";
 
         runButton.onclick = () => {
-            console.log("%c[QuestGrabber] Running quest script...", "color: #00ff9d");
+            // console.log("%c[QuestGrabber] Running quest script...", "color: #00ff9d");
             try {
                 eval(QUEST_SCRIPT);
             } catch (e) {
@@ -217,7 +286,6 @@ function addQuestButton() {
         };
 
         stack.appendChild(runButton);
-        console.log("[QuestGrabber] Run button successfully added next to Orbs buttons");
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
@@ -225,7 +293,6 @@ function addQuestButton() {
 
 // Initialize
 addQuestButton();
-console.log("%c[QuestGrabber] Ready! Look for the golden 'Complete Quest!' button.", "color: #ffd700");
 `;
         }
 
