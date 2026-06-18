@@ -96,7 +96,7 @@
             font-weight: 500;
         }
 
-        .extra a {
+        a {
             color: #00ff9d;
             text-decoration: none;
         }
@@ -105,7 +105,7 @@
 
 <body>
     <div class="container">
-        <h1>Quest Grabber</h1>
+        <h1>Quest Grabber v<span id="version">0.0.0</span></h1>
 
         <button id="generateBtn">Generate Script</button>
 
@@ -120,6 +120,16 @@
         <p style="color:#888; font-size:15px;">
             Copy the entire code above and paste it into Discord Console (Ctrl + Shift + I → Console)
         </p>
+        <p style="color:#888; font-size:15px;">
+            Either download the <a
+                href="https://discord.com/api/downloads/distributions/app/installers/latest?channel=ptb&platform=win&arch=x64">ptb
+                client</a>, or use <a
+                href="https://www.reddit.com/r/discordapp/comments/sc61n3/comment/hu4fw5x/">this</a> to enable DevTools
+            on stable.
+        </p>
+        <p style="color:#888; font-size:15px;">You might need to change the <u>Find_Button</u> variable to match the
+            text of the button in your Discord
+            version.</p>
     </div>
 
     <footer>
@@ -137,6 +147,10 @@
 
     <script>
         const GIST_URL = "https://api.github.com/gists/204cd9d42013ded9faf646fae7f89fbb";
+
+        const version = "1.1.2";
+
+        document.getElementById("version").textContent = version;
 
         async function fetchWithRetry(url, maxRetries = 10) {
             for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -183,7 +197,7 @@
 // Paste this entire code into Discord Console
 // =============================================
 
-console.log("%c[QuestGrabber] Initializing...", "color: #ffd700; font-weight: bold");
+console.log("%c[QGrabber] Initializing... ${version}", "color: #ffd700; font-weight: bold");
 
 // Toast Notification System
 function showQuestToast(message, duration = 10000) {
@@ -262,7 +276,7 @@ function addQuestButton() {
 
     const observer = new MutationObserver(() => {
         const exploreButton = Array.from(document.querySelectorAll("button"))
-            .find(btn => btn.textContent?.includes("Explore Orbs Exclusives"));
+            .find(btn => btn.textContent?.includes(Find_Button));
 
         if (!exploreButton) return;
 
@@ -278,11 +292,11 @@ function addQuestButton() {
         runButton.onmouseout = () => runButton.style.backgroundColor = "#FFD700";
 
         runButton.onclick = () => {
-            // console.log("%c[QuestGrabber] Running quest script...", "color: #00ff9d");
+            // console.log("%c[QGrabber] Running quest script...", "color: #00ff9d");
             try {
                 eval(QUEST_SCRIPT);
             } catch (e) {
-                console.error("[QuestGrabber] Execution error:", e);
+                console.error("[QGrabber] Execution error:", e);
             }
         };
 
@@ -293,6 +307,8 @@ function addQuestButton() {
 }
 
 // Initialize
+
+const Find_Button = "Explore Orbs Exclusives"; // Change this to match the button text in your Discord version
 addQuestButton();
 `;
         }
