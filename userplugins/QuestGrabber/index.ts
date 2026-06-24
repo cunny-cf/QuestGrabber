@@ -11,7 +11,7 @@ import { showToast, Toasts } from "@webpack/common";
 
 let cachedScript: string | null = null;
 let cachedRemoteVersion: string | null = null;   // ← Version cache
-const CURRENT_VERSION = "1.1.3";
+const CURRENT_VERSION = "1.2.1";
 
 
 // GitHub repo info
@@ -127,7 +127,7 @@ const cfg = definePluginSettings({
 export default definePlugin({
     name: "QuestGrabber",
     description: "Grabs and runs aaimia's CompleteDiscordQuest script for Orbs. \n(https://gist.github.com/aamiaa/204cd9d42013ded9faf646fae7f89fbb)",
-    authors: [{ name: "Hina", id: 444684887363026974n }],
+    authors: [{ name: "Nemu-tan", id: 651263919163179029n }],
     version: CURRENT_VERSION,           // ← Added
     settings: cfg,
 
@@ -136,8 +136,24 @@ export default definePlugin({
 
         const observer = new MutationObserver(() => {
             // More specific selector: Look for the stack that contains "Explore Orbs Exclusives" or "Discord Orbs Terms"
+            // Button text variants to look for (add more as needed)
+            const buttonTexts = [
+                "Explore Orbs Exclusives",
+                "View Quest"
+            ];
+
+            const Find_Button = "View Quest";
+
+            // Find button using list + fallback
             const exploreButton = Array.from(document.querySelectorAll("button"))
-                .find(btn => btn.textContent?.includes("Explore Orbs Exclusives"));
+                .find(btn => {
+                    const text = btn.textContent?.trim();
+                    if (!text) return false;
+
+                    // Check if any of the variants match
+                    return buttonTexts.some(variant => text.includes(variant)) ||
+                        text.includes(Find_Button);
+                });
 
             if (!exploreButton) return;
 
