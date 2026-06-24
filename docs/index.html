@@ -113,7 +113,7 @@
 
         <textarea id="output" readonly placeholder="Generated script will appear here..."></textarea>
 
-        <button id="copyBtn" style="display: none; margin: 0 auto 20px auto; display: none;">
+        <button id="copyBtn" style="display: none; margin: 0 auto 25px auto;">
             📋 Copy to Clipboard
         </button>
 
@@ -148,7 +148,7 @@
     <script>
         const GIST_URL = "https://api.github.com/gists/204cd9d42013ded9faf646fae7f89fbb";
 
-        const version = "1.1.2";
+        const version = "1.2.1";
 
         document.getElementById("version").textContent = version;
 
@@ -275,8 +275,22 @@ function addQuestButton() {
     document.getElementById("questgrabber-run-btn")?.remove();
 
     const observer = new MutationObserver(() => {
+        // Button text variants to look for (add more as needed)
+        const buttonTexts = [
+            "Explore Orbs Exclusives",
+            "View Quest"
+        ];
+
+        // Find button using list + fallback
         const exploreButton = Array.from(document.querySelectorAll("button"))
-            .find(btn => btn.textContent?.includes(Find_Button));
+            .find(btn => {
+                const text = btn.textContent?.trim();
+                if (!text) return false;
+                
+                // Check if any of the variants match
+                return buttonTexts.some(variant => text.includes(variant)) ||
+                    text.includes(Find_Button);
+            });
 
         if (!exploreButton) return;
 
@@ -350,19 +364,44 @@ addQuestButton();
             const copyBtn = document.getElementById('copyBtn');
             const originalText = copyBtn.textContent;
 
-            try {
-                await navigator.clipboard.writeText(output.value);
+            if (!output.value) {
+                copyBtn.textContent = "❌ Nothing to copy!";
+                setTimeout(() => copyBtn.textContent = originalText, 2000);
+                return;
+            }
 
-                copyBtn.textContent = "✅ Copied to Clipboard!";
+            try {
+                // Modern Clipboard API (works on HTTPS)
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(output.value);
+                }
+                // Fallback for local file://
+                else {
+                    const textarea = document.createElement("textarea");
+                    textarea.value = output.value;
+                    textarea.style.position = "fixed";
+                    textarea.style.left = "-999999px";
+                    textarea.style.top = "-999999px";
+                    document.body.appendChild(textarea);
+                    textarea.focus();
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                }
+
+                copyBtn.textContent = "✅ Copied Successfully!";
                 copyBtn.style.backgroundColor = "#00ff9d";
+                copyBtn.style.color = "black";
 
                 setTimeout(() => {
                     copyBtn.textContent = originalText;
                     copyBtn.style.backgroundColor = "#ffd700";
+                    copyBtn.style.color = "black";
                 }, 2500);
+
             } catch (err) {
-                copyBtn.textContent = "❌ Failed to copy";
                 console.error(err);
+                copyBtn.textContent = "❌ Failed to Copy";
                 setTimeout(() => {
                     copyBtn.textContent = originalText;
                     copyBtn.style.backgroundColor = "#ffd700";
