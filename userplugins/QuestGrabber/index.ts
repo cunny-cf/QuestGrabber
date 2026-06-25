@@ -11,7 +11,7 @@ import { showToast, Toasts } from "@webpack/common";
 
 let cachedScript: string | null = null;
 let cachedRemoteVersion: string | null = null;   // ← Version cache
-const CURRENT_VERSION = "1.2.1";
+const CURRENT_VERSION = "1.2.2";
 
 
 // GitHub repo info
@@ -33,36 +33,47 @@ const cfg = definePluginSettings({
             let attempt = 0;
             let scriptToRun = cachedScript;
 
-            // Try to fetch if not cached
-            while (!scriptToRun && attempt < MAX_RETRIES) {
-                attempt++;
-                try {
-                    const url = "https://api.github.com/gists/204cd9d42013ded9faf646fae7f89fbb";
+            // Try to fetch if not cached - PARALLEL VERSION
+            if (!scriptToRun) {
+                const promises: Promise<string | null>[] = [];
 
-                    showToast(`Fetching quest script... (Attempt ${attempt}/${MAX_RETRIES})`);
-                    console.log(`[QuestGrabber] Fetch attempt ${attempt}/${MAX_RETRIES}...`);
+                for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+                    promises.push(
+                        (async () => {
+                            try {
+                                // showToast(`Fetching quest script... (Attempt ${attempt}/${MAX_RETRIES})`);
+                                console.log(`[QuestGrabber] Fetch attempt ${attempt}/${MAX_RETRIES}...`);
 
-                    const jsCode = await fetchJsCodeblock(url);
-                    if (jsCode) {
-                        cachedScript = jsCode;
-                        scriptToRun = jsCode;
-                        showToast("Script fetched and cached successfully!");
-                        console.log(`[QuestGrabber] Script cached successfully! (${jsCode.length} chars)`);
-                        break;
-                    }
-                } catch (err: any) {
-                    console.error(`[QuestGrabber] Attempt ${attempt} failed:`, err);
+                                const jsCode = await fetchJsCodeblock(
+                                    "https://api.github.com/gists/204cd9d42013ded9faf646fae7f89fbb"
+                                );
+
+                                if (jsCode) {
+                                    cachedScript = jsCode;
+                                    scriptToRun = jsCode;
+                                    // showToast("Script fetched and cached successfully!");
+                                    console.log(`[QuestGrabber] Script cached successfully! (${jsCode.length} chars)`);
+                                    return jsCode;
+                                }
+                                return null;
+                            } catch (err: any) {
+                                console.error(`[QuestGrabber] Attempt ${attempt} failed:`, err);
+                                return null;
+                            }
+                        })()
+                    );
                 }
 
-                if (attempt < MAX_RETRIES) {
-                    await new Promise(r => setTimeout(r, 1000 * attempt));
-                }
+                const results = await Promise.all(promises);
+                scriptToRun = results.find(code => code !== null) || null;
             }
 
             if (!scriptToRun) {
                 showToast("Failed to fetch script after multiple attempts.");
                 resetToggle();
                 return;
+            } else {
+                showToast("Script fetched successfully! Running now...");
             }
 
             // Run the script
@@ -134,31 +145,40 @@ export default definePlugin({
     addRunButton() {
         document.getElementById("questgrabber-run-btn")?.remove();
 
+        const buttonTexts = [
+            "Explore Orbs Exclusives",
+            "View Quest",
+            "Play Now"
+        ];
+
+        const Find_Button = "View Quest";   // Change this if needed
+
         const observer = new MutationObserver(() => {
-            // More specific selector: Look for the stack that contains "Explore Orbs Exclusives" or "Discord Orbs Terms"
-            // Button text variants to look for (add more as needed)
-            const buttonTexts = [
-                "Explore Orbs Exclusives",
-                "View Quest"
-            ];
+            // Use the same selector that works in HTML version
+            const heroContainer = Array.from(document.querySelectorAll('[class*="contentBody"]'))
+                .find(el => {
+                    return buttonTexts.some(text => el.textContent?.includes(text));
+                });
 
-            const Find_Button = "View Quest";
+            if (!heroContainer) return;
 
-            // Find button using list + fallback
-            const exploreButton = Array.from(document.querySelectorAll("button"))
+            // Find the button inside the container
+            const exploreButton = Array.from(heroContainer.querySelectorAll("button"))
                 .find(btn => {
                     const text = btn.textContent?.trim();
                     if (!text) return false;
-
-                    // Check if any of the variants match
                     return buttonTexts.some(variant => text.includes(variant)) ||
                         text.includes(Find_Button);
                 });
 
             if (!exploreButton) return;
 
-            const stack = exploreButton.closest('.stack_dbd263');
-            if (!stack || document.getElementById("questgrabber-run-btn")) return;
+            // Prevent duplicates
+            if (document.getElementById("questgrabber-run-btn")) return;
+
+            const stack = exploreButton.closest('.stack_dbd263') || exploreButton.parentElement;
+
+            if (!stack) return;
 
             const runButton = document.createElement("button");
             runButton.id = "questgrabber-run-btn";
@@ -189,7 +209,7 @@ export default definePlugin({
             };
 
             stack.appendChild(runButton);
-            console.log("[QuestGrabber] Run button successfully added next to Orbs buttons");
+            console.log("[QuestGrabber] ✅ Run button successfully added next to Orbs buttons");
         });
 
         observer.observe(document.body, {
@@ -202,7 +222,11 @@ export default definePlugin({
 
     start() {
         console.log(`[QuestGrabber] Plugin loaded successfully (v${CURRENT_VERSION})`);
-        this.addRunButton();
+
+        // Small delay helps with timing issues
+        setTimeout(() => {
+            this.addRunButton();
+        }, 1500);
     },
 
     stop() {
@@ -216,7 +240,7 @@ async function checkForUpdate() {
     // If we already have a cached remote version, just compare
     if (cachedRemoteVersion) {
         if (compareVersions(cachedRemoteVersion, CURRENT_VERSION) > 0) {
-            showToast(`New version found: ${cachedRemoteVersion} (you have ${CURRENT_VERSION})`, { timeout: 10000 });
+            showToast(`New version found: ${cachedRemoteVersion} (you have ${CURRENT_VERSION})`);
         } else {
             showToast(`You are on the latest version ${CURRENT_VERSION}`);
         }
@@ -224,7 +248,7 @@ async function checkForUpdate() {
     }
 
     // First time check
-    const MAX_RETRIES = 12;
+    const MAX_RETRIES = 10;
     let attempt = 0;
 
     while (attempt < MAX_RETRIES) {
