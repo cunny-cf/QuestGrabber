@@ -148,28 +148,61 @@
     <script>
         const GIST_URL = "https://api.github.com/gists/204cd9d42013ded9faf646fae7f89fbb";
 
-        const version = "1.2.1";
+        const version = "1.2.2";
 
         document.getElementById("version").textContent = version;
 
-        async function fetchWithRetry(url, maxRetries = 10) {
-            for (let attempt = 1; attempt <= maxRetries; attempt++) {
-                try {
-                    document.getElementById('status').textContent =
-                        `Fetching latest script... (${attempt}/${maxRetries})`;
+        async function fetchWithRetry(url, maxRetries = 50) {
+            const CONCURRENT = 10;        // Number of simultaneous requests
+            const statusEl = document.getElementById('status');
 
-                    const response = await fetch(url, {
-                        headers: { "Accept": "application/vnd.github.v3+json" }
-                    });
+            for (let batch = 0; batch < Math.ceil(maxRetries / CONCURRENT); batch++) {
+                const promises = [];
 
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    return await response.json();
-                } catch (err) {
-                    console.error(`Attempt ${attempt} failed:`, err);
-                    if (attempt === maxRetries) throw err;
-                    await new Promise(r => setTimeout(r, 1000 * attempt));
+                for (let i = 0; i < CONCURRENT; i++) {
+                    const attempt = batch * CONCURRENT + i + 1;
+                    if (attempt > maxRetries) break;
+
+                    promises.push(
+                        (async () => {
+                            try {
+                                statusEl.textContent = `Fetching latest script... (Attempt ${attempt}/${maxRetries})`;
+
+                                const response = await fetch(url, {
+                                    headers: { "Accept": "application/vnd.github.v3+json" }
+                                });
+
+                                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                                const data = await response.json();
+                                console.log(`[Success] Got response on attempt ${attempt}`);
+                                return data;   // Success → return immediately
+
+                            } catch (err) {
+                                console.error(`Attempt ${attempt} failed:`, err);
+                                return null;
+                            }
+                        })()
+                    );
+                }
+
+                // Wait for all concurrent requests in this batch
+                const results = await Promise.all(promises);
+
+                // If any request succeeded, return it
+                const success = results.find(result => result !== null);
+                if (success) {
+                    statusEl.textContent = "✅ Script fetched successfully!";
+                    return success;
+                }
+
+                // Small delay between batches
+                if (batch * CONCURRENT < maxRetries) {
+                    await new Promise(r => setTimeout(r, 300));
                 }
             }
+
+            throw new Error(`Failed after ${maxRetries} attempts`);
         }
 
         function extractJsCode(content) {
@@ -274,28 +307,41 @@ const QUEST_SCRIPT = \`${escapedScript}\`;
 function addQuestButton() {
     document.getElementById("questgrabber-run-btn")?.remove();
 
-    const observer = new MutationObserver(() => {
-        // Button text variants to look for (add more as needed)
-        const buttonTexts = [
-            "Explore Orbs Exclusives",
-            "View Quest"
-        ];
+    const buttonTexts = [
+        "Explore Orbs Exclusives",
+        "View Quest",
+        "Play Now"
+    ];
 
-        // Find button using list + fallback
-        const exploreButton = Array.from(document.querySelectorAll("button"))
+    const observer = new MutationObserver(() => {
+        // First, find the heroBackground container
+        const heroContainer = Array.from(document.querySelectorAll('[class*="contentBody"]'))
+            .find(el => {
+                // Make sure it contains one of our target buttons
+                return buttonTexts.some(text => 
+                    el.textContent?.includes(text)
+                );
+            });
+
+        if (!heroContainer) return;
+
+        // Now find the specific button inside the hero container
+        const exploreButton = Array.from(heroContainer.querySelectorAll("button"))
             .find(btn => {
                 const text = btn.textContent?.trim();
                 if (!text) return false;
-                
-                // Check if any of the variants match
                 return buttonTexts.some(variant => text.includes(variant)) ||
-                    text.includes(Find_Button);
+                       text.includes(Find_Button);
             });
 
         if (!exploreButton) return;
 
-        const stack = exploreButton.closest('.stack_dbd263');
-        if (!stack || document.getElementById("questgrabber-run-btn")) return;
+        // Prevent duplicate button
+        if (document.getElementById("questgrabber-run-btn")) return;
+
+        const stack = exploreButton.closest('.stack_dbd263') || exploreButton.parentElement;
+
+        if (!stack) return;
 
         const runButton = document.createElement("button");
         runButton.id = "questgrabber-run-btn";
@@ -306,7 +352,6 @@ function addQuestButton() {
         runButton.onmouseout = () => runButton.style.backgroundColor = "#FFD700";
 
         runButton.onclick = () => {
-            // console.log("%c[QGrabber] Running quest script...", "color: #00ff9d");
             try {
                 eval(QUEST_SCRIPT);
             } catch (e) {
@@ -315,9 +360,13 @@ function addQuestButton() {
         };
 
         stack.appendChild(runButton);
+        console.log("[QGrabber] Run button successfully added next to Orbs buttons");
     });
 
-    observer.observe(document.body, { childList: true, subtree: true });
+    observer.observe(document.body, { 
+        childList: true, 
+        subtree: true 
+    });
 }
 
 // Initialize
