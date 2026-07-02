@@ -101,6 +101,60 @@
             text-decoration: none;
         }
     </style>
+    <style>
+        #changelogBtn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #ffd700;
+            border: none;
+            cursor: pointer;
+            z-index: 10000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        #changelogModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10001;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: #1a1a1a;
+            width: 90%;
+            max-width: 900px;
+            height: 85vh;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        iframe {
+            flex: 1;
+            border: none;
+        }
+
+        .modal-footer {
+            padding: 15px;
+            text-align: center;
+            background: #111;
+        }
+    </style>
 </head>
 
 <body>
@@ -132,6 +186,24 @@
             version.</p>
     </div>
 
+    <!-- Changelog Button -->
+    <button id="changelogBtn" title="Changelog">📜</button>
+
+    <!-- Changelog Modal -->
+    <div id="changelogModal"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 10001; align-items: center; justify-content: center;">
+        <div
+            style="background: #1a1a1a; width: 90%; max-width: 900px; height: 85vh; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column;">
+            <iframe src="changelog.html" style="flex: 1; border: none;"></iframe>
+            <div style="padding: 15px; text-align: center; background: #111;">
+                <button onclick="closeChangelog()"
+                    style="padding: 10px 30px; font-size: 16px; background: #ffd700; color: black; border: none; border-radius: 6px; cursor: pointer;">
+                    Close Changelog
+                </button>
+            </div>
+        </div>
+    </div>
+
     <footer>
         <p class="warning">
             ⚠️ Use at your own risk. Discord has been actively cracking down on quest automation since April 2026.<br>
@@ -146,14 +218,27 @@
     </footer>
 
     <script>
-        const GIST_URL = "https://api.github.com/gists/204cd9d42013ded9faf646fae7f89fbb";
+        const GIST_URL = "https://gist.githubusercontent.com/aamiaa/204cd9d42013ded9faf646fae7f89fbb/raw/";
 
-        const version = "1.2.2";
+        const version = "1.2.3";
+
+        // Load cached script on page load
+        const cachedScript = localStorage.getItem('questGrabberCache');
+        if (cachedScript) {
+            const output = document.getElementById('output');
+            const copyBtn = document.getElementById('copyBtn');
+            const status = document.getElementById('status');
+
+            output.value = cachedScript;
+            copyBtn.style.display = "block";
+            status.textContent = "Cached script loaded successfully! - Generate Script to check for updates";
+            status.style.color = "#00ff9d";
+        }
 
         document.getElementById("version").textContent = version;
 
-        async function fetchWithRetry(url, maxRetries = 50) {
-            const CONCURRENT = 10;        // Number of simultaneous requests
+        async function fetchWithRetry(url = GIST_URL, maxRetries = 50) {
+            const CONCURRENT = 10;
             const statusEl = document.getElementById('status');
 
             for (let batch = 0; batch < Math.ceil(maxRetries / CONCURRENT); batch++) {
@@ -168,15 +253,13 @@
                             try {
                                 statusEl.textContent = `Fetching latest script... (Attempt ${attempt}/${maxRetries})`;
 
-                                const response = await fetch(url, {
-                                    headers: { "Accept": "application/vnd.github.v3+json" }
-                                });
+                                const response = await fetch(url);
 
                                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-                                const data = await response.json();
+                                const text = await response.text();
                                 console.log(`[Success] Got response on attempt ${attempt}`);
-                                return data;   // Success → return immediately
+                                return text;
 
                             } catch (err) {
                                 console.error(`Attempt ${attempt} failed:`, err);
@@ -186,17 +269,14 @@
                     );
                 }
 
-                // Wait for all concurrent requests in this batch
                 const results = await Promise.all(promises);
-
-                // If any request succeeded, return it
                 const success = results.find(result => result !== null);
+
                 if (success) {
                     statusEl.textContent = "✅ Script fetched successfully!";
                     return success;
                 }
 
-                // Small delay between batches
                 if (batch * CONCURRENT < maxRetries) {
                     await new Promise(r => setTimeout(r, 300));
                 }
@@ -216,7 +296,7 @@
                 const match = content.match(regex);
                 if (match?.[1]) return match[1].trim();
             }
-            return content.trim();
+            return content.trim();   // fallback: return everything if no code block found
         }
 
         function generateFullScript(questScript) {
@@ -381,21 +461,24 @@ addQuestButton();
             const btn = document.getElementById('generateBtn');
             const status = document.getElementById('status');
             const output = document.getElementById('output');
-            const copyBtn = document.getElementById('copyBtn');   // ← Important
+            const copyBtn = document.getElementById('copyBtn');
 
             btn.disabled = true;
             status.style.color = "#ffffff";
 
             try {
-                const data = await fetchWithRetry(GIST_URL);
-                const rawContent = Object.values(data.files)[0].content;
+                const rawContent = await fetchWithRetry(GIST_URL);
 
                 const cleanScript = extractJsCode(rawContent);
                 const fullScript = generateFullScript(cleanScript);
 
                 output.value = fullScript;
-                copyBtn.style.display = "block";        // ← Show copy button
-                status.textContent = "✅ Script generated successfully!";
+
+                // Save to localStorage cache
+                localStorage.setItem('questGrabberCache', fullScript);
+
+                copyBtn.style.display = "block";
+                status.textContent = "✅ Script generated and cached successfully!";
                 status.style.color = "#00ff9d";
 
             } catch (err) {
@@ -457,6 +540,41 @@ addQuestButton();
                 }, 2000);
             }
         });
+
+        // === Changelog System ===
+        const CURRENT_VERSION = version;
+
+        function showChangelog() {
+            const modal = document.getElementById('changelogModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                localStorage.setItem('lastSeenVersion', CURRENT_VERSION);
+            } else {
+                console.error("[Changelog] Modal not found!");
+            }
+        }
+
+        function closeChangelog() {
+            const modal = document.getElementById('changelogModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        // Auto show on version change or first visit
+        const lastSeen = localStorage.getItem('lastSeenVersion');
+        if (!lastSeen || lastSeen !== CURRENT_VERSION) {
+            setTimeout(showChangelog, 1000);
+        }
+
+        // Floating button
+        const changelogBtn = document.getElementById('changelogBtn');
+        if (changelogBtn) {
+            changelogBtn.addEventListener('click', showChangelog);
+        } else {
+            console.error("[Changelog] Button not found!");
+        }
+
+        // Floating button
+        document.getElementById('changelogBtn').addEventListener('click', showChangelog);
     </script>
 </body>
 
