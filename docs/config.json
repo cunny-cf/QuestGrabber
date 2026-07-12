@@ -1,0 +1,54 @@
+{
+  "version": "1.2.5",
+  "gistUrl": "https://gist.githubusercontent.com/aamiaa/204cd9d42013ded9faf646fae7f89fbb/raw/",
+  "findButton": "Explore Orbs Exclusives",
+  "keywords": ["quest", "Quest", "quests", "Spoofed"],
+  "buttonTexts": [
+    "Explore Orbs Exclusives",
+    "View Quest",
+    "Play Now",
+    "Watch Now"
+  ],
+  "changelog": [
+    {
+      "version": "v1.2.5",
+      "changes": [
+        "Change webpage to use config file for faster modifications",
+        "Changed the popup log to look for exact keywords instead of partial matches"
+    ]
+    },
+    {
+      "version": "v1.2.4",
+      "changes": ["Added \"Watch Now\" to the Keywords"]
+    },
+    {
+      "version": "v1.2.3",
+      "changes": [
+        "Added floating changelog button",
+        "Switched to raw gist URL (faster & more reliable)",
+        "Added localStorage caching for generated script"
+      ]
+    },
+    {
+      "version": "v1.2.2",
+      "changes": [
+        "Improved parallel fetching",
+        "Improved button detection using heroContainer",
+        "Added \"Keyword Search\" for creating the button [\"Explore Orbs Exclusives\", \"View Quest\", \"Play Now\"]",
+        "Better copy button fallback"
+      ]
+    },
+    {
+      "version": "v1.2.1",
+      "changes": [
+        "Added toast custom notification system",
+        "Added multiple possible \"Find_Button\" text for when banners are sponsored"
+      ]
+    },
+    {
+      "version": "v1.2.0",
+      "changes": ["Initial standalone web version"]
+    }
+  ],
+  "lastUpdated": "July 12, 2026"
+}

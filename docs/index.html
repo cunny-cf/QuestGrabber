@@ -20,444 +20,215 @@
             min-height: 100vh;
             text-align: center;
         }
-
-        .container {
-            max-width: 900px;
-            padding: 40px 20px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        h1 {
-            font-size: 48px;
-            margin-bottom: 30px;
-            background: linear-gradient(90deg, #ffd700, #ffaa00);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        button {
-            background-color: #ffd700;
-            color: black;
-            border: none;
-            padding: 14px 32px;
-            font-size: 18px;
-            font-weight: 600;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-bottom: 25px;
-            transition: all 0.2s;
-        }
-
-        button:hover {
-            background-color: #ffaa00;
-            transform: translateY(-2px);
-        }
-
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        textarea {
-            width: 80vw;
-            min-height: 480px;
-            background-color: #1a1a1a;
-            color: #00ff9d;
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 16px;
-            font-family: 'Consolas', 'Courier New', monospace;
-            font-size: 14px;
-            resize: vertical;
-            margin-bottom: 30px;
-            white-space: pre;
-            box-sizing: border-box;
-            display: block;
-        }
-
-        .status {
-            margin: 15px 0;
-            min-height: 26px;
-            font-size: 15px;
-        }
-
-        footer {
-            margin-top: auto;
-            padding: 40px 0 20px;
-            color: #666;
-            font-size: 14px;
-        }
-
-        .warning {
-            color: #ff5555;
-            font-weight: 500;
-        }
-
-        a {
-            color: #00ff9d;
-            text-decoration: none;
-        }
-    </style>
-    <style>
-        #changelogBtn {
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: #ffd700;
-            border: none;
-            cursor: pointer;
-            z-index: 10000;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        #changelogModal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 10001;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: #1a1a1a;
-            width: 90%;
-            max-width: 900px;
-            height: 85vh;
-            border-radius: 8px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        iframe {
-            flex: 1;
-            border: none;
-        }
-
-        .modal-footer {
-            padding: 15px;
-            text-align: center;
-            background: #111;
-        }
+        .container { max-width: 900px; padding: 40px 20px; width: 100%; display: flex; flex-direction: column; align-items: center; }
+        h1 { font-size: 48px; margin-bottom: 30px; background: linear-gradient(90deg, #ffd700, #ffaa00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        button { background-color: #ffd700; color: black; border: none; padding: 14px 32px; font-size: 18px; font-weight: 600; border-radius: 8px; cursor: pointer; margin-bottom: 25px; transition: all 0.2s; }
+        button:hover { background-color: #ffaa00; transform: translateY(-2px); }
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
+        textarea { width: 80vw; min-height: 480px; background-color: #1a1a1a; color: #00ff9d; border: 1px solid #333; border-radius: 8px; padding: 16px; font-family: 'Consolas', 'Courier New', monospace; font-size: 14px; resize: vertical; margin-bottom: 30px; white-space: pre; box-sizing: border-box; display: block; }
+        .status { margin: 15px 0; min-height: 26px; font-size: 15px; }
+        footer { margin-top: auto; padding: 40px 0 20px; color: #666; font-size: 14px; }
+        .warning { color: #ff5555; font-weight: 500; }
+        a { color: #00ff9d; text-decoration: none; }
+        #changelogBtn { position: fixed; top: 15px; left: 15px; width: 50px; height: 50px; border-radius: 50%; background: #ffd700; border: none; cursor: pointer; z-index: 10000; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        #changelogModal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.9); z-index: 10001; align-items: center; justify-content: center; }
+        .modal-content { background: #1a1a1a; width: 90%; max-width: 900px; height: 85vh; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
+        iframe { flex: 1; border: none; }
+        .modal-footer { padding: 15px; text-align: center; background: #111; }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1>Quest Grabber v<span id="version">0.0.0</span></h1>
-
-        <button id="generateBtn">Generate Script</button>
-
+        <h1>Quest Grabber v<span id="version">...</span></h1>
+        <button id="generateBtn" disabled>Loading Config...</button>
         <div class="status" id="status"></div>
-
         <textarea id="output" readonly placeholder="Generated script will appear here..."></textarea>
-
-        <button id="copyBtn" style="display: none; margin: 0 auto 25px auto;">
-            📋 Copy to Clipboard
-        </button>
-
-        <p style="color:#888; font-size:15px;">
-            Copy the entire code above and paste it into Discord Console (Ctrl + Shift + I → Console)
-        </p>
-        <p style="color:#888; font-size:15px;">
-            Either download the <a
-                href="https://discord.com/api/downloads/distributions/app/installers/latest?channel=ptb&platform=win&arch=x64">ptb
-                client</a>, or use <a
-                href="https://www.reddit.com/r/discordapp/comments/sc61n3/comment/hu4fw5x/">this</a> to enable DevTools
-            on stable.
-        </p>
-        <p style="color:#888; font-size:15px;">You might need to change the <u>Find_Button</u> variable to match the
-            text of the button in your Discord
-            version.</p>
+        <button id="copyBtn" style="display: none; margin: 0 auto 25px auto;">📋 Copy to Clipboard</button>
+        <p style="color:#888; font-size:15px;">Copy the entire code above and paste it into Discord Console (Ctrl + Shift + I → Console)</p>
+        <p style="color:#888; font-size:15px;">Either download the <a href="https://discord.com/api/downloads/distributions/app/installers/latest?channel=ptb&platform=win&arch=x64">ptb client</a>, or use <a href="https://www.reddit.com/r/discordapp/comments/sc61n3/comment/hu4fw5x/">this</a> to enable DevTools on stable.</p>
+        <p style="color:#888; font-size:15px;">You might need to change the <u>Find_Button</u> variable to match the text of the button in your Discord version.</p>
     </div>
 
-    <!-- Changelog Button -->
+    <!-- Changelog Button & Modal -->
     <button id="changelogBtn" title="Changelog">📜</button>
-
-    <!-- Changelog Modal -->
-    <div id="changelogModal"
-        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 10001; align-items: center; justify-content: center;">
-        <div
-            style="background: #1a1a1a; width: 90%; max-width: 900px; height: 85vh; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column;">
-            <iframe src="changelog.html" style="flex: 1; border: none;"></iframe>
-            <div style="padding: 15px; text-align: center; background: #111;">
-                <button onclick="closeChangelog()"
-                    style="padding: 10px 30px; font-size: 16px; background: #ffd700; color: black; border: none; border-radius: 6px; cursor: pointer;">
-                    Close Changelog
-                </button>
+    <div id="changelogModal">
+        <div class="modal-content">
+            <iframe src="changelog.html"></iframe>
+            <div class="modal-footer">
+                <button onclick="closeChangelog()" style="padding: 10px 30px; font-size: 16px; background: #ffd700; color: black; border: none; border-radius: 6px; cursor: pointer;">Close Changelog</button>
             </div>
         </div>
     </div>
 
     <footer>
-        <p class="warning">
-            ⚠️ Use at your own risk. Discord has been actively cracking down on quest automation since April 2026.<br>
-            You may receive warnings or account flags.
-        </p>
-        <p class="extra">Original <a
-                href="https://gist.github.com/aamiaa/204cd9d42013ded9faf646fae7f89fbb">CompleteDiscordQuest</a> script
-            by <a href="https://gist.github.com/aamiaa">aamiaa</a></p>
-        <p class="extra">This is a standalone version of the script, designed to be used outside of the <a
-                href="https://github.com/cunny-cf/QuestGrabber">Vencord plugin.</a></p>
+        <p class="warning">⚠️ Use at your own risk. Discord has been actively cracking down on quest automation since April 2026.<br>You may receive warnings or account flags.</p>
+        <p class="extra">Original <a href="https://gist.github.com/aamiaa/204cd9d42013ded9faf646fae7f89fbb">CompleteDiscordQuest</a> script by <a href="https://gist.github.com/aamiaa">aamiaa</a></p>
+        <p class="extra">This is a standalone version of the script, designed to be used outside of the <a href="https://github.com/cunny-cf/QuestGrabber">Vencord plugin.</a></p>
         <p>Not affiliated with Discord • For educational purposes only</p>
     </footer>
 
     <script>
-        const GIST_URL = "https://gist.githubusercontent.com/aamiaa/204cd9d42013ded9faf646fae7f89fbb/raw/";
+        // Configuration State
+        let GIST_URL = "";
+        let CURRENT_VERSION = "";
+        let Find_Button = "";
+        let keywords = [];
+        let buttonTexts = [];
 
-        const version = "1.2.4";
+        async function initConfig() {
+            try {
+                const response = await fetch('config.json');
+                const config = await response.json();
+                
+                GIST_URL = config.gistUrl;
+                CURRENT_VERSION = config.version;
+                Find_Button = config.findButton;
+                keywords = config.keywords;
+                buttonTexts = config.buttonTexts;
 
-        // Load cached script on page load
-        const cachedScript = localStorage.getItem('questGrabberCache');
-        if (cachedScript) {
-            const output = document.getElementById('output');
-            const copyBtn = document.getElementById('copyBtn');
-            const status = document.getElementById('status');
+                document.getElementById("version").textContent = CURRENT_VERSION;
+                document.getElementById('generateBtn').disabled = false;
+                document.getElementById('generateBtn').textContent = "Generate Script";
 
-            output.value = cachedScript;
-            copyBtn.style.display = "block";
-            status.textContent = "Cached script loaded successfully! - Generate Script to check for updates";
-            status.style.color = "#00ff9d";
+                // Cache Check
+                const cachedScript = localStorage.getItem('questGrabberCache');
+                if (cachedScript) {
+                    const output = document.getElementById('output');
+                    const copyBtn = document.getElementById('copyBtn');
+                    const status = document.getElementById('status');
+                    output.value = cachedScript;
+                    copyBtn.style.display = "block";
+                    status.textContent = "Cached script loaded successfully! - Generate Script to check for updates";
+                    status.style.color = "#00ff9d";
+                }
+
+                initChangelog();
+            } catch (error) {
+                document.getElementById('status').textContent = "❌ Failed to load config.json";
+                document.getElementById('status').style.color = "#ff5555";
+                console.error("Config Load Error:", error);
+            }
         }
 
-        document.getElementById("version").textContent = version;
-
-        async function fetchWithRetry(url = GIST_URL, maxRetries = 50) {
+        async function fetchWithRetry(url, maxRetries = 50) {
             const CONCURRENT = 10;
             const statusEl = document.getElementById('status');
-
             for (let batch = 0; batch < Math.ceil(maxRetries / CONCURRENT); batch++) {
                 const promises = [];
-
                 for (let i = 0; i < CONCURRENT; i++) {
                     const attempt = batch * CONCURRENT + i + 1;
                     if (attempt > maxRetries) break;
-
-                    promises.push(
-                        (async () => {
-                            try {
-                                statusEl.textContent = `Fetching latest script... (Attempt ${attempt}/${maxRetries})`;
-
-                                const response = await fetch(url);
-
-                                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-                                const text = await response.text();
-                                console.log(`[Success] Got response on attempt ${attempt}`);
-                                return text;
-
-                            } catch (err) {
-                                console.error(`Attempt ${attempt} failed:`, err);
-                                return null;
-                            }
-                        })()
-                    );
+                    promises.push((async () => {
+                        try {
+                            statusEl.textContent = `Fetching latest script... (Attempt ${attempt}/${maxRetries})`;
+                            const response = await fetch(url);
+                            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                            return await response.text();
+                        } catch (err) {
+                            return null;
+                        }
+                    })());
                 }
-
                 const results = await Promise.all(promises);
                 const success = results.find(result => result !== null);
-
                 if (success) {
                     statusEl.textContent = "✅ Script fetched successfully!";
                     return success;
                 }
-
-                if (batch * CONCURRENT < maxRetries) {
-                    await new Promise(r => setTimeout(r, 300));
-                }
+                if (batch * CONCURRENT < maxRetries) await new Promise(r => setTimeout(r, 300));
             }
-
             throw new Error(`Failed after ${maxRetries} attempts`);
         }
 
         function extractJsCode(content) {
-            const regexes = [
-                /```js\s*([\s\S]*?)\s*```/i,
-                /```javascript\s*([\s\S]*?)\s*```/i,
-                /```(?:js|javascript)\s*([\s\S]*?)\s*```/i
-            ];
-
+            const regexes = [ /```js\s*([\s\S]*?)\s*```/i, /```javascript\s*([\s\S]*?)\s*```/i, /```(?:js|javascript)\s*([\s\S]*?)\s*```/i ];
             for (const regex of regexes) {
                 const match = content.match(regex);
                 if (match?.[1]) return match[1].trim();
             }
-            return content.trim();   // fallback: return everything if no code block found
+            return content.trim(); 
         }
 
         function generateFullScript(questScript) {
-            const escapedScript = questScript
-                .replace(/\\/g, "\\\\")
-                .replace(/`/g, "\\`")
-                .replace(/\$\{/g, "\\${");
-
+            const escapedScript = questScript.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$\{/g, "\\${");
             return `// =============================================
 // Quest Grabber - Standalone Version
 // Paste this entire code into Discord Console
 // =============================================
 
-console.log("%c[QGrabber] Initializing... ${version}", "color: #ffd700; font-weight: bold");
+console.log("%c[QGrabber] Initializing... ${CURRENT_VERSION}", "color: #ffd700; font-weight: bold");
 
-// Toast Notification System
 function showQuestToast(message, duration = 10000) {
     let toast = document.getElementById("quest-toast");
     if (toast) toast.remove();
-
     toast = document.createElement("div");
     toast.id = "quest-toast";
-    toast.style.cssText = \`
-        position: fixed;
-        top: 80px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
-        color: #ffffff;
-        padding: 14px 24px;
-        border-radius: 8px;
-        font-family: 'Segoe UI', sans-serif;
-        font-size: 15px;
-        font-weight: 500;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
-        border: 1px solid #ffd700;
-        z-index: 999999;
-        pointer-events: none;
-        text-align: center;
-        min-width: 320px;
-        max-width: 620px;
-        white-space: pre-wrap;
-        line-height: 1.4;
-    \`;
-
+    toast.style.cssText = \`position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #1e1e1e, #2a2a2a); color: #ffffff; padding: 14px 24px; border-radius: 8px; font-family: 'Segoe UI', sans-serif; font-size: 15px; font-weight: 500; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7); border: 1px solid #ffd700; z-index: 999999; pointer-events: none; text-align: center; min-width: 320px; max-width: 620px; white-space: pre-wrap; line-height: 1.4;\`;
     toast.textContent = message;
     document.body.appendChild(toast);
-
-    setTimeout(() => {
-        if (toast) {
-            toast.style.transition = "opacity 0.4s ease";
-            toast.style.opacity = "0";
-            setTimeout(() => toast.remove(), 400);
-        }
-    }, duration);
+    setTimeout(() => { if (toast) { toast.style.transition = "opacity 0.4s ease"; toast.style.opacity = "0"; setTimeout(() => toast.remove(), 400); } }, duration);
 }
 
-// Enhanced console interceptor
 const originalLog = console.log;
 const originalError = console.error;
 const originalWarn = console.warn;
-
-const keywords = ["quest", "Quest", "quests", "Spoofed"];
+const keywords = ${JSON.stringify(keywords)};
 
 const enhancedLog = (...args) => {
     originalLog(...args);
-
     try {
         const message = args.map(a => String(a)).join(" ").trim();
         if (!message) return;
-
-        if (keywords.some(kw => message.includes(kw))) {
-            showQuestToast(message);
-        }
-    } catch (e) {
-        originalLog("[Toast Error]", ...args);
-    }
+        
+        // Use regular expressions with word boundaries to match exact words
+        const hasKeywordMatch = keywords.some(kw => new RegExp("\\\\b" + kw + "\\\\b").test(message));
+        
+        if (hasKeywordMatch) showQuestToast(message);
+    } catch (e) { originalLog("[Toast Error]", ...args); }
 };
-
-// Apply interceptor
-console.log = enhancedLog;
-console.error = enhancedLog;
-console.warn = enhancedLog;
+console.log = enhancedLog; console.error = enhancedLog; console.warn = enhancedLog;
 
 const QUEST_SCRIPT = \`${escapedScript}\`;
 
-// Button
 function addQuestButton() {
     document.getElementById("questgrabber-run-btn")?.remove();
-
-    const buttonTexts = [
-        "Explore Orbs Exclusives",
-        "View Quest",
-        "Play Now",
-        "Watch Now"
-    ];
-
+    const btnTexts = ${JSON.stringify(buttonTexts)};
+    
     const observer = new MutationObserver(() => {
-        // First, find the heroBackground container
         const heroContainer = Array.from(document.querySelectorAll('[class*="contentBody"]'))
-            .find(el => {
-                // Make sure it contains one of our target buttons
-                return buttonTexts.some(text => 
-                    el.textContent?.includes(text)
-                );
-            });
-
+            .find(el => btnTexts.some(text => el.textContent?.includes(text)));
         if (!heroContainer) return;
 
-        // Now find the specific button inside the hero container
         const exploreButton = Array.from(heroContainer.querySelectorAll("button"))
             .find(btn => {
                 const text = btn.textContent?.trim();
                 if (!text) return false;
-                return buttonTexts.some(variant => text.includes(variant)) ||
-                       text.includes(Find_Button);
+                return btnTexts.some(variant => text.includes(variant)) || text.includes("${Find_Button}");
             });
 
-        if (!exploreButton) return;
-
-        // Prevent duplicate button
-        if (document.getElementById("questgrabber-run-btn")) return;
-
+        if (!exploreButton || document.getElementById("questgrabber-run-btn")) return;
         const stack = exploreButton.closest('.stack_dbd263') || exploreButton.parentElement;
-
         if (!stack) return;
 
         const runButton = document.createElement("button");
         runButton.id = "questgrabber-run-btn";
         runButton.textContent = "Complete Quest!";
         runButton.style.cssText = "margin: 0; padding: 10px 16px; background-color: #FFD700; color: black; border: none; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; white-space: nowrap; flex-shrink: 0;";
-
         runButton.onmouseover = () => runButton.style.backgroundColor = "#af9500ff";
         runButton.onmouseout = () => runButton.style.backgroundColor = "#FFD700";
-
-        runButton.onclick = () => {
-            try {
-                eval(QUEST_SCRIPT);
-            } catch (e) {
-                console.error("[QGrabber] Execution error:", e);
-            }
-        };
-
+        runButton.onclick = () => { try { eval(QUEST_SCRIPT); } catch (e) { console.error("[QGrabber] Execution error:", e); } };
+        
         stack.appendChild(runButton);
         console.log("[QGrabber] Run button successfully added next to Orbs buttons");
     });
-
-    observer.observe(document.body, { 
-        childList: true, 
-        subtree: true 
-    });
+    observer.observe(document.body, { childList: true, subtree: true });
 }
 
-// Initialize
-
-const Find_Button = "Explore Orbs Exclusives"; // Change this to match the button text in your Discord version
 addQuestButton();
 `;
         }
 
-        // Generate Handler
         document.getElementById('generateBtn').addEventListener('click', async () => {
             const btn = document.getElementById('generateBtn');
             const status = document.getElementById('status');
@@ -469,19 +240,14 @@ addQuestButton();
 
             try {
                 const rawContent = await fetchWithRetry(GIST_URL);
-
                 const cleanScript = extractJsCode(rawContent);
                 const fullScript = generateFullScript(cleanScript);
 
                 output.value = fullScript;
-
-                // Save to localStorage cache
                 localStorage.setItem('questGrabberCache', fullScript);
-
                 copyBtn.style.display = "block";
                 status.textContent = "✅ Script generated and cached successfully!";
                 status.style.color = "#00ff9d";
-
             } catch (err) {
                 status.textContent = "❌ Failed to fetch the script. Please try again.";
                 status.style.color = "#ff5555";
@@ -491,92 +257,54 @@ addQuestButton();
             }
         });
 
-        // Copy Handler
         document.getElementById('copyBtn').addEventListener('click', async () => {
             const output = document.getElementById('output');
             const copyBtn = document.getElementById('copyBtn');
             const originalText = copyBtn.textContent;
 
-            if (!output.value) {
-                copyBtn.textContent = "❌ Nothing to copy!";
-                setTimeout(() => copyBtn.textContent = originalText, 2000);
-                return;
-            }
+            if (!output.value) return;
 
             try {
-                // Modern Clipboard API (works on HTTPS)
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     await navigator.clipboard.writeText(output.value);
-                }
-                // Fallback for local file://
-                else {
+                } else {
                     const textarea = document.createElement("textarea");
                     textarea.value = output.value;
                     textarea.style.position = "fixed";
-                    textarea.style.left = "-999999px";
-                    textarea.style.top = "-999999px";
                     document.body.appendChild(textarea);
                     textarea.focus();
                     textarea.select();
                     document.execCommand('copy');
                     document.body.removeChild(textarea);
                 }
-
                 copyBtn.textContent = "✅ Copied Successfully!";
                 copyBtn.style.backgroundColor = "#00ff9d";
                 copyBtn.style.color = "black";
-
-                setTimeout(() => {
-                    copyBtn.textContent = originalText;
-                    copyBtn.style.backgroundColor = "#ffd700";
-                    copyBtn.style.color = "black";
-                }, 2500);
-
+                setTimeout(() => { copyBtn.textContent = originalText; copyBtn.style.backgroundColor = "#ffd700"; copyBtn.style.color = "black"; }, 2500);
             } catch (err) {
-                console.error(err);
                 copyBtn.textContent = "❌ Failed to Copy";
-                setTimeout(() => {
-                    copyBtn.textContent = originalText;
-                    copyBtn.style.backgroundColor = "#ffd700";
-                }, 2000);
+                setTimeout(() => { copyBtn.textContent = originalText; copyBtn.style.backgroundColor = "#ffd700"; }, 2000);
             }
         });
-
-        // === Changelog System ===
-        const CURRENT_VERSION = version;
 
         function showChangelog() {
             const modal = document.getElementById('changelogModal');
             if (modal) {
                 modal.style.display = 'flex';
                 localStorage.setItem('lastSeenVersion', CURRENT_VERSION);
-            } else {
-                console.error("[Changelog] Modal not found!");
             }
         }
 
-        function closeChangelog() {
-            const modal = document.getElementById('changelogModal');
-            if (modal) modal.style.display = 'none';
+        function closeChangelog() { document.getElementById('changelogModal').style.display = 'none'; }
+
+        function initChangelog() {
+            const lastSeen = localStorage.getItem('lastSeenVersion');
+            if (!lastSeen || lastSeen !== CURRENT_VERSION) setTimeout(showChangelog, 1000);
+            document.getElementById('changelogBtn').addEventListener('click', showChangelog);
         }
 
-        // Auto show on version change or first visit
-        const lastSeen = localStorage.getItem('lastSeenVersion');
-        if (!lastSeen || lastSeen !== CURRENT_VERSION) {
-            setTimeout(showChangelog, 1000);
-        }
-
-        // Floating button
-        const changelogBtn = document.getElementById('changelogBtn');
-        if (changelogBtn) {
-            changelogBtn.addEventListener('click', showChangelog);
-        } else {
-            console.error("[Changelog] Button not found!");
-        }
-
-        // Floating button
-        document.getElementById('changelogBtn').addEventListener('click', showChangelog);
+        // Start App
+        initConfig();
     </script>
 </body>
-
 </html>

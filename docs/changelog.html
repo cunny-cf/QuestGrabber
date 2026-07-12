@@ -1,77 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quest Grabber - Changelog</title>
     <style>
-        body {
-            margin: 0;
-            padding: 20px;
-            background-color: #0f0f0f;
-            color: #ffffff;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            line-height: 1.6;
-        }
-
-        h1 {
-            color: #ffd700;
-        }
-
-        h2 {
-            color: #00ff9d;
-            margin-top: 30px;
-        }
-
-        .version {
-            color: #ffd700;
-            font-weight: bold;
-        }
-
-        ul {
-            padding-left: 20px;
-        }
+        body { margin: 0; padding: 20px; background-color: #0f0f0f; color: #ffffff; font-family: 'Segoe UI', system-ui, sans-serif; line-height: 1.6; }
+        h1 { color: #ffd700; }
+        .version { color: #ffd700; font-weight: bold; margin-top: 20px;}
+        ul { padding-left: 20px; }
+        #last-updated { margin-top: 40px; color: #666; font-size: 14px; }
     </style>
 </head>
-
 <body>
     <h1>Quest Grabber Changelog</h1>
     
-    <p class="version">v1.2.4</p>
-    <ul>
-        <li>Added "Watch Now" to the Keywords</li>
-    </ul>
+    <div id="changelog-container">Loading changelog...</div>
+    <p id="last-updated"></p>
 
-    <p class="version">v1.2.3</p>
-    <ul>
-        <li>Added floating changelog button</li>
-        <li>Switched to raw gist URL (faster & more reliable)</li>
-        <li>Added localStorage caching for generated script</li>
-    </ul>
+    <script>
+        fetch('config.json')
+            .then(response => response.json())
+            .then(config => {
+                const container = document.getElementById('changelog-container');
+                container.innerHTML = ''; // clear loading state
 
-    <p class="version">v1.2.2</p>
-    <ul>
-        <li>Improved parallel fetching</li>
-        <li>Improved button detection using heroContainer</li>
-        <li>Added "Keyword Search" for creating the button ["Explore Orbs Exclusives", "View Quest", "Play Now"]</li>
-        <li>Better copy button fallback</li>
-    </ul>
+                config.changelog.forEach(log => {
+                    const versionNode = document.createElement('p');
+                    versionNode.className = 'version';
+                    versionNode.textContent = log.version;
 
-    <p class="version">v1.2.1</p>
-    <ul>
-        <li>Added toast custom notification system</li>
-        <li>Added multiple possible "Find_Button" text for when banners are sponsored</li>
-    </ul>
+                    const ulNode = document.createElement('ul');
+                    log.changes.forEach(change => {
+                        const liNode = document.createElement('li');
+                        liNode.textContent = change;
+                        ulNode.appendChild(liNode);
+                    });
 
-    <p class="version">v1.2.0</p>
-    <ul>
-        <li>Initial standalone web version</li>
-    </ul>
+                    container.appendChild(versionNode);
+                    container.appendChild(ulNode);
+                });
 
-    <p style="margin-top: 40px; color: #666; font-size: 14px;">
-        Last updated: July 12, 2026
-    </p>
+                document.getElementById('last-updated').textContent = `Last updated: ${config.lastUpdated}`;
+            })
+            .catch(err => {
+                document.getElementById('changelog-container').textContent = "Failed to load changelog data.";
+                console.error(err);
+            });
+    </script>
 </body>
-
 </html>
