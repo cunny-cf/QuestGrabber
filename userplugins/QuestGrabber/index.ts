@@ -148,7 +148,8 @@ export default definePlugin({
         const buttonTexts = [
             "Explore Orbs Exclusives",
             "View Quest",
-            "Play Now"
+            "Play Now",
+            "Watch Now"
         ];
 
         const Find_Button = "View Quest";   // Change this if needed
