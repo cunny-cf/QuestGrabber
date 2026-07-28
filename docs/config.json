@@ -1,5 +1,5 @@
 {
-  "version": "1.2.5",
+  "version": "1.2.6",
   "gistUrl": "https://gist.githubusercontent.com/aamiaa/204cd9d42013ded9faf646fae7f89fbb/raw/",
   "findButton": "Explore Orbs Exclusives",
   "keywords": ["quest", "Quest", "quests", "Spoofed"],
@@ -10,6 +10,12 @@
     "Watch Now"
   ],
   "changelog": [
+    {
+      "version": "v1.2.6",
+      "changes":[
+        "Added temporary fix for \"Watch Video\" quests, as it was resulting to error"
+      ]
+    },
     {
       "version": "v1.2.5",
       "changes": [

@@ -20,21 +20,139 @@
             min-height: 100vh;
             text-align: center;
         }
-        .container { max-width: 900px; padding: 40px 20px; width: 100%; display: flex; flex-direction: column; align-items: center; }
-        h1 { font-size: 48px; margin-bottom: 30px; background: linear-gradient(90deg, #ffd700, #ffaa00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        button { background-color: #ffd700; color: black; border: none; padding: 14px 32px; font-size: 18px; font-weight: 600; border-radius: 8px; cursor: pointer; margin-bottom: 25px; transition: all 0.2s; }
-        button:hover { background-color: #ffaa00; transform: translateY(-2px); }
-        button:disabled { opacity: 0.6; cursor: not-allowed; }
-        textarea { width: 80vw; min-height: 480px; background-color: #1a1a1a; color: #00ff9d; border: 1px solid #333; border-radius: 8px; padding: 16px; font-family: 'Consolas', 'Courier New', monospace; font-size: 14px; resize: vertical; margin-bottom: 30px; white-space: pre; box-sizing: border-box; display: block; }
-        .status { margin: 15px 0; min-height: 26px; font-size: 15px; }
-        footer { margin-top: auto; padding: 40px 0 20px; color: #666; font-size: 14px; }
-        .warning { color: #ff5555; font-weight: 500; }
-        a { color: #00ff9d; text-decoration: none; }
-        #changelogBtn { position: fixed; top: 15px; left: 15px; width: 50px; height: 50px; border-radius: 50%; background: #ffd700; border: none; cursor: pointer; z-index: 10000; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; font-size: 24px; }
-        #changelogModal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.9); z-index: 10001; align-items: center; justify-content: center; }
-        .modal-content { background: #1a1a1a; width: 90%; max-width: 900px; height: 85vh; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
-        iframe { flex: 1; border: none; }
-        .modal-footer { padding: 15px; text-align: center; background: #111; }
+
+        .container {
+            max-width: 900px;
+            padding: 40px 20px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 48px;
+            margin-bottom: 30px;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        button {
+            background-color: #ffd700;
+            color: black;
+            border: none;
+            padding: 14px 32px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 25px;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background-color: #ffaa00;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        textarea {
+            width: 80vw;
+            min-height: 480px;
+            background-color: #1a1a1a;
+            color: #00ff9d;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+            margin-bottom: 30px;
+            white-space: pre;
+            box-sizing: border-box;
+            display: block;
+        }
+
+        .status {
+            margin: 15px 0;
+            min-height: 26px;
+            font-size: 15px;
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 40px 0 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .warning {
+            color: #ff5555;
+            font-weight: 500;
+        }
+
+        a {
+            color: #00ff9d;
+            text-decoration: none;
+        }
+
+        #changelogBtn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #ffd700;
+            border: none;
+            cursor: pointer;
+            z-index: 10000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        #changelogModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10001;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: #1a1a1a;
+            width: 90%;
+            max-width: 900px;
+            height: 85vh;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        iframe {
+            flex: 1;
+            border: none;
+        }
+
+        .modal-footer {
+            padding: 15px;
+            text-align: center;
+            background: #111;
+        }
     </style>
 </head>
 
@@ -45,9 +163,15 @@
         <div class="status" id="status"></div>
         <textarea id="output" readonly placeholder="Generated script will appear here..."></textarea>
         <button id="copyBtn" style="display: none; margin: 0 auto 25px auto;">📋 Copy to Clipboard</button>
-        <p style="color:#888; font-size:15px;">Copy the entire code above and paste it into Discord Console (Ctrl + Shift + I → Console)</p>
-        <p style="color:#888; font-size:15px;">Either download the <a href="https://discord.com/api/downloads/distributions/app/installers/latest?channel=ptb&platform=win&arch=x64">ptb client</a>, or use <a href="https://www.reddit.com/r/discordapp/comments/sc61n3/comment/hu4fw5x/">this</a> to enable DevTools on stable.</p>
-        <p style="color:#888; font-size:15px;">You might need to change the <u>Find_Button</u> variable to match the text of the button in your Discord version.</p>
+        <p style="color:#888; font-size:15px;">Copy the entire code above and paste it into Discord Console (Ctrl +
+            Shift + I → Console)</p>
+        <p style="color:#888; font-size:15px;">Either download the <a
+                href="https://discord.com/api/downloads/distributions/app/installers/latest?channel=ptb&platform=win&arch=x64">ptb
+                client</a>, or use <a
+                href="https://www.reddit.com/r/discordapp/comments/sc61n3/comment/hu4fw5x/">this</a> to enable DevTools
+            on stable.</p>
+        <p style="color:#888; font-size:15px;">You might need to change the <u>Find_Button</u> variable to match the
+            text of the button in your Discord version.</p>
     </div>
 
     <!-- Changelog Button & Modal -->
@@ -56,15 +180,21 @@
         <div class="modal-content">
             <iframe src="changelog.html"></iframe>
             <div class="modal-footer">
-                <button onclick="closeChangelog()" style="padding: 10px 30px; font-size: 16px; background: #ffd700; color: black; border: none; border-radius: 6px; cursor: pointer;">Close Changelog</button>
+                <button onclick="closeChangelog()"
+                    style="padding: 10px 30px; font-size: 16px; background: #ffd700; color: black; border: none; border-radius: 6px; cursor: pointer;">Close
+                    Changelog</button>
             </div>
         </div>
     </div>
 
     <footer>
-        <p class="warning">⚠️ Use at your own risk. Discord has been actively cracking down on quest automation since April 2026.<br>You may receive warnings or account flags.</p>
-        <p class="extra">Original <a href="https://gist.github.com/aamiaa/204cd9d42013ded9faf646fae7f89fbb">CompleteDiscordQuest</a> script by <a href="https://gist.github.com/aamiaa">aamiaa</a></p>
-        <p class="extra">This is a standalone version of the script, designed to be used outside of the <a href="https://github.com/cunny-cf/QuestGrabber">Vencord plugin.</a></p>
+        <p class="warning">⚠️ Use at your own risk. Discord has been actively cracking down on quest automation since
+            April 2026.<br>You may receive warnings or account flags.</p>
+        <p class="extra">Original <a
+                href="https://gist.github.com/aamiaa/204cd9d42013ded9faf646fae7f89fbb">CompleteDiscordQuest</a> script
+            by <a href="https://gist.github.com/aamiaa">aamiaa</a></p>
+        <p class="extra">This is a standalone version of the script, designed to be used outside of the <a
+                href="https://github.com/cunny-cf/QuestGrabber">Vencord plugin.</a></p>
         <p>Not affiliated with Discord • For educational purposes only</p>
     </footer>
 
@@ -80,7 +210,7 @@
             try {
                 const response = await fetch('config.json');
                 const config = await response.json();
-                
+
                 GIST_URL = config.gistUrl;
                 CURRENT_VERSION = config.version;
                 Find_Button = config.findButton;
@@ -142,22 +272,25 @@
         }
 
         function extractJsCode(content) {
-            const regexes = [ /```js\s*([\s\S]*?)\s*```/i, /```javascript\s*([\s\S]*?)\s*```/i, /```(?:js|javascript)\s*([\s\S]*?)\s*```/i ];
+            const regexes = [/```js\s*([\s\S]*?)\s*```/i, /```javascript\s*([\s\S]*?)\s*```/i, /```(?:js|javascript)\s*([\s\S]*?)\s*```/i];
             for (const regex of regexes) {
                 const match = content.match(regex);
                 if (match?.[1]) return match[1].trim();
             }
-            return content.trim(); 
+            return content.trim();
         }
 
         function generateFullScript(questScript) {
-            const escapedScript = questScript.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$\{/g, "\\${");
+            const fixedScript = patchQuestScript(questScript);
+
+            const escapedScript = fixedScript.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$\{/g, "\\${");
+
             return `// =============================================
-// Quest Grabber - Standalone Version
+// Quest Grabber - Standalone Version (with applicationId fix)
 // Paste this entire code into Discord Console
 // =============================================
 
-console.log("%c[QGrabber] Initializing... ${CURRENT_VERSION}", "color: #ffd700; font-weight: bold");
+console.log("%c[QGrabber] Initializing... ${CURRENT_VERSION} (with applicationId fix)", "color: #ffd700; font-weight: bold");
 
 function showQuestToast(message, duration = 10000) {
     let toast = document.getElementById("quest-toast");
@@ -180,10 +313,7 @@ const enhancedLog = (...args) => {
     try {
         const message = args.map(a => String(a)).join(" ").trim();
         if (!message) return;
-        
-        // Use regular expressions with word boundaries to match exact words
         const hasKeywordMatch = keywords.some(kw => new RegExp("\\\\b" + kw + "\\\\b").test(message));
-        
         if (hasKeywordMatch) showQuestToast(message);
     } catch (e) { originalLog("[Toast Error]", ...args); }
 };
@@ -227,6 +357,55 @@ function addQuestButton() {
 
 addQuestButton();
 `;
+        }
+
+        // ==================== NEW PATCH FUNCTION ====================
+        // ==================== IMPROVED PATCH FUNCTION ====================
+        function patchQuestScript(script) {
+            // Check if the buggy section exists
+            if (!script.includes("const questName = quest.config.messages.questName")) {
+                console.log("[QGrabber] Fix block not found, returning original script");
+                return script;
+            }
+
+            console.log("[QGrabber] ✅ Found old code block - Applying video quest fix...");
+
+            // More flexible regex replacement
+            const oldPattern = /const questName = quest\.config\.messages\.questName[\s\S]*?let secondsDone = quest\.userStatus\?\.progress\?\.\[taskName\]\?\.value \?\? 0;?/;
+
+            const newBlock = `        const questName = quest.config.messages?.questName || "Unknown Quest";
+        const taskConfig = quest.config.taskConfig ?? quest.config.taskConfigV2;
+        const taskName = supportedTasks.find(x => taskConfig.tasks?.[x] != null);
+        const taskData = taskConfig.tasks?.[taskName];
+
+        const secondsNeeded = taskData?.target || 900;
+        let secondsDone = quest.userStatus?.progress?.[taskName]?.value ?? 0;
+
+        // === FIXED APPLICATION ID LOGIC (Video Quest Crash Fix) ===
+        let applicationId = quest.config.application?.id;
+        
+        if (!applicationId && taskData?.applications?.[0]?.id) {
+            applicationId = taskData.applications[0].id;
+        } else if (!applicationId && taskData?.application_id) {
+            applicationId = taskData.application_id;
+        }
+
+        // Video quests don't need applicationId
+        if (!applicationId && (taskName === "PLAY_ON_DESKTOP" || taskName === "STREAM_ON_DESKTOP")) {
+            console.warn(\`⚠️ Could not find applicationId for \${taskName} quest. Skipping...\`);
+            doJob();
+            return;
+        }`;
+
+            const patched = script.replace(oldPattern, newBlock);
+
+            if (patched !== script) {
+                console.log("[QGrabber] ✅ Successfully patched the script!");
+            } else {
+                console.warn("[QGrabber] ⚠️ Pattern matched but replacement may have failed.");
+            }
+
+            return patched;
         }
 
         document.getElementById('generateBtn').addEventListener('click', async () => {
@@ -307,4 +486,5 @@ addQuestButton();
         initConfig();
     </script>
 </body>
+
 </html>
