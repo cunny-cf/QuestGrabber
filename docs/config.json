@@ -7,9 +7,16 @@
     "Explore Orbs Exclusives",
     "View Quest",
     "Play Now",
-    "Watch Now"
+    "Watch Now",
+    "Pre-Order Now"
   ],
   "changelog": [
+    {
+      "version": "v1.2.7",
+      "changes":[
+        "Added \"Pre-Order Now\" to the Keywords"
+      ]
+    },
     {
       "version": "v1.2.6b",
       "changes":[
