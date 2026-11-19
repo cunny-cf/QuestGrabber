@@ -8,9 +8,16 @@
     "View Quest",
     "Play Now",
     "Watch Now",
-    "Pre-Order Now"
+    "Pre-Order Now",
+    "Buy Now"
   ],
   "changelog": [
+    {
+      "version": "v1.2.8",
+      "changes":[
+        "Added \"Buy Now\" to the Keywords"
+      ]
+    },
     {
       "version": "v1.2.7",
       "changes":[
