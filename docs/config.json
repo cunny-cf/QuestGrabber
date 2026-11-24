@@ -1,5 +1,5 @@
 {
-  "version": "1.2.8",
+  "version": "1.2.9",
   "gistUrl": "https://gist.githubusercontent.com/aamiaa/204cd9d42013ded9faf646fae7f89fbb/raw/",
   "findButton": "Explore Orbs Exclusives",
   "keywords": ["quest", "Quest", "quests", "Spoofed"],
@@ -9,9 +9,15 @@
     "Play Now",
     "Watch Now",
     "Pre-Order Now",
-    "Buy Now"
+    "Buy Now",
+    "Explore Orbs Shop"
   ],
-  "changelog": [
+  "changelog": [{
+      "version": "v1.2.9",
+      "changes":[
+        "Added \"Explore Orbs Shop\" to the Keywords"
+      ]
+    },
     {
       "version": "v1.2.8",
       "changes":[
